@@ -10,18 +10,10 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-// Char is a type declaration representing a single character
-type Char byte
-
-// ToString converts a character to a string
-func (c Char) ToString() string {
-	return string(c)
-}
-
 // DataExporter is a library for export SQL server data to text files and encrypts specified fields to anonymise data
 type DataExporter struct {
 	Db         *sql.DB
-	Separator  Char
+	Separator  string
 	OutputDir  string
 	Library    EncryptedColumnLibrary
 	columnData []interface{}
@@ -44,7 +36,7 @@ func (e DataExporter) ExportCsv(table string) (int64, error) {
 		return rows, err
 	}
 
-	header := columnHeaders(columns, e.Separator.ToString())
+	header := columnHeaders(columns, e.Separator)
 	e.initializeColumns(columns)
 
 	outputFile, err := os.Open(e.OutputDir + "/" + table + ".csv")
@@ -108,7 +100,7 @@ func (e *DataExporter) createCsvOutputString(table string, columns []string) str
 		}
 
 		if i < columnCount-1 {
-			output += e.Separator.ToString()
+			output += e.Separator
 		}
 	}
 
@@ -119,7 +111,7 @@ func (e *DataExporter) createSQLOutputString(table string, columns []string) str
 	columnValues := ""
 	columnCount := len(e.columnData)
 
-	columnNames := columnHeaders(columns, e.Separator.ToString())
+	columnNames := columnHeaders(columns, e.Separator)
 
 	for i := 0; i < columnCount; i++ {
 		encrypt, err := e.Library.Exists(table, columns[i])

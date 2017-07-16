@@ -52,7 +52,7 @@ func run(c dataexport.Config) error {
 
 	exporter := dataexport.DataExporter{
 		Db:        db,
-		Separator: dataexport.Char([]byte(";")[0]),
+		Separator: ";",
 		OutputDir: c.OutputPath,
 		Library:   library,
 		Secret:    "test",

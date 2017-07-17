@@ -50,7 +50,7 @@ func run(c dataexport.Config) error {
 		return err
 	}
 
-	exporter := dataexport.DataExporter{
+	exporter := dataexport.Exporter{
 		Db:        db,
 		Separator: ";",
 		OutputDir: c.OutputPath,

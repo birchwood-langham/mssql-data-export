@@ -62,3 +62,7 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+.idea/misc.xml
+.idea/modules.xml
+.idea/mssql-data-export.iml
+.idea/vcs.xml

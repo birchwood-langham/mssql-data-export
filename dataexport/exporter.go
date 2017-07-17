@@ -6,12 +6,12 @@ import (
 	"os"
 	"time"
 
-	// this library is required only for the DataExporter to export MSSQL data
+	// this library is required only for the Exporter to export MSSQL data
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-// DataExporter is a library for export SQL server data to text files and encrypts specified fields to anonymise data
-type DataExporter struct {
+// Exporter is a library for export SQL server data to text files and encrypts specified fields to anonymise data
+type Exporter struct {
 	Db         *sql.DB
 	Separator  string
 	OutputDir  string
@@ -21,7 +21,7 @@ type DataExporter struct {
 }
 
 // ExportCsv queries the data in the table specified and writes the data to output directory in a CSV format
-func (e DataExporter) ExportCsv(table string) (int64, error) {
+func (e *Exporter) ExportCsv(table string) (int64, error) {
 	result, err := e.Db.Query("select * from $1;", table)
 	defer result.Close()
 
@@ -67,7 +67,7 @@ func (e DataExporter) ExportCsv(table string) (int64, error) {
 	return rows, nil
 }
 
-func (e *DataExporter) createCsvOutputString(table string, columns []string) string {
+func (e *Exporter) createCsvOutputString(table string, columns []string) string {
 	output := ""
 	columnCount := len(e.columnData)
 
@@ -78,7 +78,7 @@ func (e *DataExporter) createCsvOutputString(table string, columns []string) str
 			return ""
 		}
 
-		switch d := (e.columnData[i]).(type) {
+		switch d := e.columnData[i].(type) {
 		case nil:
 			output += "null"
 		case bool:
@@ -107,7 +107,7 @@ func (e *DataExporter) createCsvOutputString(table string, columns []string) str
 	return fmt.Sprintf("%s\n", output)
 }
 
-func (e *DataExporter) createSQLOutputString(table string, columns []string) string {
+func (e *Exporter) createSQLOutputString(table string, columns []string) string {
 	columnValues := ""
 	columnCount := len(e.columnData)
 
@@ -120,7 +120,7 @@ func (e *DataExporter) createSQLOutputString(table string, columns []string) str
 			return ""
 		}
 
-		switch d := (e.columnData[i]).(type) {
+		switch d := e.columnData[i].(type) {
 		case nil:
 			columnValues += "null"
 		case bool:
@@ -150,7 +150,7 @@ func (e *DataExporter) createSQLOutputString(table string, columns []string) str
 	return fmt.Sprintf("insert into %s (%s) values (%s)\n", table, columnNames, columnValues)
 }
 
-func (e *DataExporter) initializeColumns(columns []string) {
+func (e *Exporter) initializeColumns(columns []string) {
 
 	columnCount := len(columns)
 
@@ -166,7 +166,7 @@ func columnHeaders(columns []string, separator string) string {
 	header := ""
 	for i := 0; i < columnCount; i++ {
 		if i < columnCount-1 {
-			header += ","
+			header += separator
 		}
 
 		header += columns[i]
@@ -176,7 +176,7 @@ func columnHeaders(columns []string, separator string) string {
 }
 
 // ExportSQL queries the data in the table specified and writes the data as insert statements to the output directory specified
-func (e *DataExporter) ExportSQL(table string) (int64, error) {
+func (e *Exporter) ExportSQL(table string) (int64, error) {
 	result, err := e.Db.Query("select * from $1;", table)
 	defer result.Close()
 

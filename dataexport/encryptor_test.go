@@ -8,7 +8,7 @@ func TestEncryptNoSecret(t *testing.T) {
 
 	encrypted_text := Encrypt(encrypt_text, secret)
 
-	expected_result := "2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c"
+	expected_result := "Lpl1hUiXKo6IIq1H+hAX/3Lwbz/2oBaFH0XDmHMrxQw="
 
 	if expected_result != encrypted_text {
 		t.Logf("Encrypt text failed, expecting %s, got %s", expected_result, encrypted_text)
@@ -24,7 +24,7 @@ func TestEncryptWithSecret(t *testing.T) {
 
 	encrypted_text := Encrypt(encrypt_text, secret)
 
-	expected_result := "e1ef5ca0f4c48a7a02e664b3686427a14c6dd730dc80819d9edb3242ea49fd28"
+	expected_result := "4e9coPTEinoC5mSzaGQnoUxt1zDcgIGdntsyQupJ/Sg="
 
 	if expected_result != encrypted_text {
 		t.Logf("Encrypt text failed, expecting %s, got %s", expected_result, encrypted_text)

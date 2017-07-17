@@ -21,9 +21,9 @@ func TestLibrary(t *testing.T) {
 	// now test exists
 	table_name := "testdb.dbo.test_table"
 	test_column1 := "firstname"
-	//test_column2 := "lastname"
-	//test_column3 := "Address1"
-	//
+	test_column2 := "lastname"
+	test_column3 := "Address1"
+
 	found, err := library.Exists(table_name, test_column1)
 	if err != nil {
 		t.Fatalf("Could not perform lookup table %s, column %s from library file: %s", table_name, test_column1, test_library_file)
@@ -33,24 +33,24 @@ func TestLibrary(t *testing.T) {
 		t.Logf("EncryptedColumnLibrary could not find table: %s, column: %s", table_name, test_column1)
 		t.Fail()
 	}
-	//
-	//found, err = library.Exists(table_name, test_column2)
-	//if err != nil {
-	//	t.Fatalf("Could not perform lookup table %s, column %s from library file: %s", table_name, test_column2, test_library_file)
-	//}
-	//
-	//if !found {
-	//	t.Logf("EncryptedColumnLibrary could not find table: %s, column: %s", table_name, test_column2)
-	//	t.Fail()
-	//}
-	//
-	//found, err = library.Exists(table_name, test_column3)
-	//if err != nil {
-	//	t.Fatalf("Could not perform lookup table %s, column %s from library file: %s", table_name, test_column3, test_library_file)
-	//}
-	//
-	//if found {
-	//	t.Logf("EncryptedColumnLibrary found something that shouldn't be there - table: %s, column: %s", table_name, test_column3)
-	//	t.Fail()
-	//}
+
+	found, err = library.Exists(table_name, test_column2)
+	if err != nil {
+		t.Fatalf("Could not perform lookup table %s, column %s from library file: %s", table_name, test_column2, test_library_file)
+	}
+
+	if !found {
+		t.Logf("EncryptedColumnLibrary could not find table: %s, column: %s", table_name, test_column2)
+		t.Fail()
+	}
+
+	found, err = library.Exists(table_name, test_column3)
+	if err != nil {
+		t.Fatalf("Could not perform lookup table %s, column %s from library file: %s", table_name, test_column3, test_library_file)
+	}
+
+	if found {
+		t.Logf("EncryptedColumnLibrary found something that shouldn't be there - table: %s, column: %s", table_name, test_column3)
+		t.Fail()
+	}
 }

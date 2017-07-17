@@ -34,7 +34,7 @@ func (e *EncryptedColumnLibrary) Parse(libraryFile string) (int, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		data := strings.Split(scanner.Text(), ";")
-		table, column := data[0], data[1]
+		table, column := strings.ToLower(strings.TrimSpace(data[0])), strings.ToLower(strings.TrimSpace(data[1]))
 
 		l, ok := e.library[table]
 
@@ -52,18 +52,20 @@ func (e *EncryptedColumnLibrary) Parse(libraryFile string) (int, error) {
 
 // Exists checks the library to see if the table and column specified should be encrypted
 func (e *EncryptedColumnLibrary) Exists(table string, column string) (bool, error) {
+	_table := strings.ToLower(strings.TrimSpace(table))
+	_column := strings.ToLower(strings.TrimSpace(column))
+
 	if e.library == nil {
 		return false, errors.New("The library has not been created, specify a library file and Parse it before using it.")
 	}
 
-	cols, ok := e.library[table]
-
+	cols, ok := e.library[_table]
 	if !ok {
 		return false, nil
 	}
 
 	for _, v := range cols {
-		if v == column {
+		if v == _column {
 			return true, nil
 		}
 	}

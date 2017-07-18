@@ -7,7 +7,9 @@ import (
 	"time"
 
 	// this library is required only for the Exporter to export MSSQL data
+	"github.com/denisenkom/go-mssqldb"
 	_ "github.com/denisenkom/go-mssqldb"
+	"log"
 	"strings"
 )
 
@@ -22,10 +24,17 @@ type Exporter struct {
 }
 
 // ExportCsv queries the data in the table specified and writes the data to output directory in a CSV format
-func (e *Exporter) ExportCsv(table string) (int64, error) {
+func (e *Exporter) ExportCsv(table string, filter string) (int64, error) {
 	table = strings.ToLower(strings.TrimSpace(table))
+	filter = strings.ToLower(strings.TrimSpace(filter))
 
-	result, err := e.Db.Query(fmt.Sprintf("select * from %s", table))
+	query := fmt.Sprintf("select * from %s", table)
+
+	if filter != "" {
+		query += fmt.Sprintf(" where %s", filter)
+	}
+
+	result, err := e.Db.Query(query)
 
 	if err != nil {
 		return int64(0), err
@@ -130,14 +139,27 @@ func (e *Exporter) formatValue(value *interface{}, encrypt bool, sqlOutput bool)
 
 		return v.Format("2006-01-02 15:04:05.000")
 	case []byte:
+		// first check to see if it's a unique identifier field
+		var uid mssql.UniqueIdentifier
+		err := uid.Scan(*value)
+
+		// Scan didn't produce an error so the field must be a uniqueidentifier type
+		if err == nil {
+			// we've just read a unique id so just output the data
+			return fmt.Sprintf("%s", uid.String())
+		}
+
+		// it's not a uniqueidentifier type field so therefore try converting it to a string
+		// and encrypt it if necessary
 		if encrypt {
 			if sqlOutput {
-				return fmt.Sprintf("%s", Encrypt(string(v), e.Secret))
+				return fmt.Sprintf("'%s'", Encrypt(string(v), e.Secret))
 			}
 			return fmt.Sprintf("%s", Encrypt(string(v), e.Secret))
 		} else {
 			if sqlOutput {
-				return fmt.Sprintf("%s", v)
+				// we need to escape any single quotes because we're not encrypting it
+				return fmt.Sprintf("'%s'", strings.Replace(string(v), "'", "''", -1))
 			}
 
 			return fmt.Sprintf("%s", v)
@@ -162,7 +184,7 @@ func (e *Exporter) formatValue(value *interface{}, encrypt bool, sqlOutput bool)
 			return fmt.Sprintf("%s", Encrypt(v, e.Secret))
 		} else {
 			if sqlOutput {
-				return fmt.Sprintf("'%s'", v)
+				return fmt.Sprintf("'%s'", strings.Replace(v, "'", "''", -1))
 			}
 
 			return fmt.Sprintf("%s", v)
@@ -201,10 +223,20 @@ func columnHeaders(columns []string, separator string) string {
 }
 
 // ExportSQL queries the data in the table specified and writes the data as insert statements to the output directory specified
-func (e *Exporter) ExportSQL(table string) (int64, error) {
+func (e *Exporter) ExportSQL(table string, filter string) (int64, error) {
 	table = strings.ToLower(strings.TrimSpace(table))
+	filter = strings.ToLower(strings.TrimSpace(filter))
 
-	result, err := e.Db.Query(fmt.Sprintf("select * from %s;", table))
+	query := fmt.Sprintf("select * from %s", table)
+
+	if filter != "" {
+		query += fmt.Sprintf(" where %s", filter)
+	}
+
+	log.Printf("Executing query: %s\n", query)
+
+	result, err := e.Db.Query(query)
+
 	if err != nil {
 		return 0, err
 	}

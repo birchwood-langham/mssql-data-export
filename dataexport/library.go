@@ -33,7 +33,15 @@ func (e *EncryptedColumnLibrary) Parse(libraryFile string) (int, error) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		data := strings.Split(scanner.Text(), ";")
+		input := strings.TrimSpace(scanner.Text())
+
+		// ignore line if it has no content
+		// or doesn't have a ; to split the contents properly.
+		if input == "" || !strings.Contains(input, ";") {
+			continue
+		}
+
+		data := strings.Split(input, ";")
 		table, column := strings.ToLower(strings.TrimSpace(data[0])), strings.ToLower(strings.TrimSpace(data[1]))
 
 		l, ok := e.library[table]

@@ -8,9 +8,15 @@ This application exports data from a MS SQL Server database and allows specific 
 To use, you will need to create a text file listing the tables you want to export in the format:
 
 ```
-    <database>.<schema>.<table1>
-    <database>.<schema>.<table2>
-    <database>.<schema>.<table3>
+    <database>.<schema>.<table1>;<where clause>
+    <database>.<schema>.<table2>;
+    <database>.<schema>.<table3>;
+```
+
+If a where clause is included, this will be added to the query to filter the results, you do not need to include the where keyword, just the conditions that you want to filter with; e.g.
+
+```SQL
+Column1 = 'Test' AND Column2 > '2012-01-01'
 ```
 
 You should create one table per line in the text file. The name is not important, and if you are exporting from one table with the default schema, you could just list each table name you want exporting because it will just substitute the table name into the query.

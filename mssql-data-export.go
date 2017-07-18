@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"birchwoodlangham.com/mssql-data-export/dataexport"
+	"strings"
 )
 
 func main() {
@@ -73,14 +74,33 @@ func run(c dataexport.Config) error {
 	var count int64
 
 	for scanner.Scan() {
-		table := scanner.Text()
+		line := scanner.Text()
+
+		if line == "" {
+			continue
+		}
+
+		// in case there's no ; to split the table with the filter condition, let's just add it so the
+		// application can continue without raising an error
+		if !strings.Contains(line, ";") {
+			line += ";"
+		}
+
+		lineData := strings.Split(line, ";")
+
+		table, filter := "", ""
+		if len(lineData) > 1 {
+			filter = strings.ToLower(strings.TrimSpace(lineData[1]))
+		}
+
+		table = strings.ToLower(strings.TrimSpace(lineData[0]))
 
 		log.Printf("Exporting table %s\n", table)
 
 		if c.OutputType == "CSV" {
-			count, err = exporter.ExportCsv(table)
+			count, err = exporter.ExportCsv(table, filter)
 		} else {
-			count, err = exporter.ExportSQL(table)
+			count, err = exporter.ExportSQL(table, filter)
 		}
 
 		if err != nil {

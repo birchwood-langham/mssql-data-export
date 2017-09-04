@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	errInvalidHost = errors.New("Invalid hostname provided")
+	errInvalidHost = errors.New("invalid hostname provided")
 	//errInvalidDatabase     = errors.New("Invalid database provided")
-	errInvalidTablesConfig = errors.New("Tables configuration is required, but has not been provided, see -t flag for help")
-	errInvalidOutputType   = errors.New("Output Type must be CSV or SQL")
+	errInvalidTablesConfig = errors.New("tables configuration is required, but has not been provided, see -t flag for help")
+	errInvalidOutputType   = errors.New("output type must be CSV or SQL")
 )
 
 // Config represents application configurations that should be set with commandline flags

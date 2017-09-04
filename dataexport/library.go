@@ -15,7 +15,7 @@ type EncryptedColumnLibrary struct {
 // Parse will read the encrypted columns configuration file and create the library
 func (e *EncryptedColumnLibrary) Parse(libraryFile string) (int, error) {
 	if libraryFile == "" {
-		return 0, errors.New("Encrypted Column Library file has not been provided, cannot parse library")
+		return 0, errors.New("encrypted column library file has not been provided, cannot parse library")
 	}
 
 	count := 0
@@ -64,7 +64,7 @@ func (e *EncryptedColumnLibrary) Exists(table string, column string) (bool, erro
 	_column := strings.ToLower(strings.TrimSpace(column))
 
 	if e.library == nil {
-		return false, errors.New("The library has not been created, specify a library file and Parse it before using it.")
+		return false, errors.New("the library has not been created, specify a library file and Parse it before using it")
 	}
 
 	cols, ok := e.library[_table]

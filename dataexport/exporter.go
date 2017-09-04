@@ -138,6 +138,18 @@ func (e *Exporter) formatValue(value *interface{}, encrypt bool, sqlOutput bool)
 		}
 
 		return v.Format("2006-01-02 15:04:05.000")
+	case int, int8, int16, int32, int64:
+		if encrypt {
+			return Encrypt(fmt.Sprintf("%d", v), e.Secret)
+		} else {
+			return fmt.Sprintf("%d", v)
+		}
+	case float32, float64:
+		if encrypt {
+			return Encrypt(fmt.Sprintf("%f", v), e.Secret)
+		} else {
+			return fmt.Sprintf("%f", v)
+		}
 	case []byte:
 		// first check to see if it's a unique identifier field
 		var uid mssql.UniqueIdentifier
@@ -163,18 +175,6 @@ func (e *Exporter) formatValue(value *interface{}, encrypt bool, sqlOutput bool)
 			}
 
 			return fmt.Sprintf("%s", v)
-		}
-	case int, int8, int16, int32, int64:
-		if encrypt {
-			return Encrypt(fmt.Sprintf("%d", v), e.Secret)
-		} else {
-			return fmt.Sprintf("%d", v)
-		}
-	case float32, float64:
-		if encrypt {
-			return Encrypt(fmt.Sprintf("%f", v), e.Secret)
-		} else {
-			return fmt.Sprintf("%f", v)
 		}
 	case string:
 		if encrypt {
